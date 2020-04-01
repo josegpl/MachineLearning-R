@@ -55,3 +55,21 @@ confusionMatrix(data = y_hat, reference = test_set$sex)
 
 #low sensitivity because the prevalence of females is low, so databse is biased
 
+#balanced accuracy and F1 score
+# maximize F-score
+cutoff <- seq(61, 70)
+F_1 <- map_dbl(cutoff, function(x){
+  y_hat <- ifelse(train_set$height > x, "Male", "Female") %>% 
+    factor(levels = levels(test_set$sex))
+  F_meas(data = y_hat, reference = factor(train_set$sex))
+})
+
+max(F_1)
+best_cutoff <- cutoff[which.max(F_1)]
+best_cutoff
+y_hat <- ifelse(test_set$height > best_cutoff, "Male", "Female") %>% 
+  factor(levels = levels(test_set$sex))
+sensitivity(data = y_hat, reference = test_set$sex)
+specificity(data = y_hat, reference = test_set$sex)
+
+confusionMatrix(data = y_hat, reference = test_set$sex)
